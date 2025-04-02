@@ -1,30 +1,25 @@
-import http from 'http';
-import fs from 'fs';
-import url from 'url';
+const express = require('express');
+const path = require('path');
+const app = express();
 
-const getPath = (reqUrl) => {
-	const parsedUrl = url.parse(reqUrl, true);
+const PORT = 3000;
 
-	if (parsedUrl.pathname === '/') {
-		return './index.html';
-	} else {
-		return `.${parsedUrl.pathname}.html`;
-	};
-};
+app.get('/', (req, res) => {
+	res.sendFile(path.join(__dirname, '/index.html'));
+});
 
-http.createServer((req, res) => {
-	fs.readFile(getPath(req.url), 'utf8', (err, data) => {
-		if (err || !data) {
-			fs.readFile('./404.html', 'utf8', (err, errData) => {
-				res.writeHead(404, {'Content-Type': 'text/html'});
-				res.write(errData);
-				return res.end();
-			})
-		} else {
-			res.writeHead(200, {'Content-Type': 'text/html'});
-			res.write(data);
-			return res.end();
-		}
-	});
-}).listen(8080);
+app.get('/contact-me', (req, res) => {
+	res.sendFile(path.join(__dirname, '/contact-me.html'));
+});
 
+app.get('/about', (req, res) => {
+	res.sendFile(path.join(__dirname, '/about.html'));
+});
+
+app.get(/(.*)/, (req, res) => {
+	res.sendFile(path.join(__dirname, '/404.html'));
+});
+
+app.listen(PORT, () => {
+	console.log(`Server running port ${PORT}!`);
+});
